@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ejercicio 3 - Tabla de Países</title>
+  <style>
+    
+    body {
+      font-family: Arial, sans-serif; 
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+    }
+
+    table {
+      border-collapse: collapse; 
+      width: 500px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.15); 
+    }
+
+    
+    thead tr {
+      background-color: #009879;
+      color: #ffffff;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 12px 15px; 
+      border: 1px solid #dddddd;
+    }
+
+    
+    tbody tr:nth-of-type(even) {
+      background-color: #f3f3f3;
+    }
+
+    
+    .bandera-img {
+      width: 30px;
+      height: auto;
+      border: 1px solid #ccc;
+    }
+    
+    caption {
+      font-size: 1.5em;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Ejercicio 2C</h1>
+
+  <table>
+    <caption>Listado de Países y Capitales</caption>
+    
+    <thead>
+      <tr>
+        <th>Bandera</th> <th>País</th>
+        <th>Capital</th>
+      </tr>
+    </thead>
+    
+    <tbody>
+      <tr>
+        <td><img src="https://flagcdn.com/w40/es.png" alt="Bandera de España" class="bandera-img"></td>
+        <td>España</td>
+        <td>Madrid</td>
+      </tr>
+      <tr>
+        <td><img src="https://flagcdn.com/w40/cn.png" alt="Bandera de China" class="bandera-img"></td>
+        <td>China</td>
+        <td>Beijing</td>
+      </tr>
+      <tr>
+        <td><img src="https://flagcdn.com/w40/pt.png" alt="Bandera de Portugal" class="bandera-img"></td>
+        <td>Portugal</td>
+        <td>Lisboa</td>
+      </tr>
+    </tbody>
+  </table>
+      <h2>Si queieres consultar la Capital de algún pais en concreto puedes hacerlo en la siguiente Web</h2>
+      <a href="https://www.infolaso.com/paises-y-capitales-del-mundo-por-continentes.html" target="_blank">
+      Países y Capitales del Mundo
+    </a>
+</body>
+</html>
