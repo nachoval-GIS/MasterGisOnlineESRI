@@ -1,0 +1,38 @@
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+
+}
+
+.menu {
+    width: 40%;
+    height: 100%;
+    background-color: #8dffc6;
+    margin: 0;
+
+    & ul {
+        width: 100%;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        & li {
+
+            & a {
+                display: block;
+                padding: 10px;
+                text-decoration: none;
+                color:  #343434;;
+                margin: 10px
+            }
+
+            & a:hover {
+                    background-color: #5bba91;
+                    cursor: pointer;
+            }
+            
+        }
+    }
+}

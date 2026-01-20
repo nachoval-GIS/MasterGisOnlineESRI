@@ -1,0 +1,36 @@
+.formulario{
+    margin: 10px;
+    border-radius: 15px;
+    box-shadow: 0 0 10px 0px rgba(110, 110, 110, 1);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(241,241,241);
+    font-family: 'Courier New', Courier, monospace;
+
+    & div{
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin: 10px;
+    }
+    & button{
+        width: 150px;
+        align-self: center;
+        height: 30px;
+        border-radius: 15px;
+        border-width: 1px;
+        border-style: solid;
+        box-shadow: 0 0 5px 0px rgba(110, 110, 110, 1);
+        background-color: #8dffc6;
+        font-family: 'Courier New', Courier, monospace;
+    }
+    & button:hover{
+        background-color: #0ff381;
+        cursor: pointer;
+    }
+
+
+    }
+}

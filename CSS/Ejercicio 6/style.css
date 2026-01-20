@@ -1,0 +1,117 @@
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.opinion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #f8fafc;
+    border: 1px solid #e0e6ed;
+    border-radius: 12px;
+    max-width: 900px;
+    margin: 20px auto;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.Centro-salud {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.Centro-salud img {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 2px solid #d1e3f0;
+}
+
+.texto-centro {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.texto-centro h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #1f3a5f;
+}
+
+.texto-centro p {
+    margin: 0;
+    color: #5f6f82;
+    font-size: 0.95rem;
+}
+
+.texto-centro div {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.texto-centro button {
+    padding: 8px 14px;
+    border-radius: 20px;
+    border: 1px solid #2c7be5;
+    background-color: #2c7be5;
+    color: #ffffff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.texto-centro button:last-child {
+    background-color: #ffffff;
+    color: #2c7be5;
+}
+
+.texto-centro button:hover {
+    background-color: #1a5fc2;
+    color: #ffffff;
+}
+
+.texto-centro button:active {
+    transform: scale(0.97);
+}
+
+.comentarios-nota {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.comentarios-nota div {
+    text-align: right;
+}
+
+.comentarios-nota p {
+    margin: 0;
+    color: #4a5a6a;
+    font-size: 0.9rem;
+}
+
+.comentarios-nota a {
+    font-size: 0.85rem;
+    color: #2c7be5;
+    text-decoration: none;
+}
+
+.comentarios-nota a:hover {
+    text-decoration: underline;
+}
+
+.comentarios-nota > p {
+    background-color: #28a745;
+    color: #ffffff;
+    font-weight: bold;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    min-width: 48px;
+    text-align: center;
+}
