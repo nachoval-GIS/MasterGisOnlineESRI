@@ -91,7 +91,26 @@ function actualizarGrafica() {
   graficaVs30.data.datasets[0].data = valores;
   graficaVs30.data.datasets[0].backgroundColor = colores[tipo];
 
+  actualizarTabla(datosFiltrados);
   graficaVs30.update();
+}
+
+function actualizarTabla(datos) {
+  const tabla = document.getElementById("tablaSondeos");
+
+  tabla.innerHTML = "";
+
+  datos.forEach(s => {
+    tabla.innerHTML += `
+      <tr>
+        <td>Sondeo ${s.id}</td>
+        <td>${s.tipo}</td>
+        <td>${s.vs30.toFixed(2)} m/s</td>
+        <td>${s.gmax.toLocaleString("es-ES", { maximumFractionDigits: 2 })}</td>
+        <td>${s.estado}</td>
+      </tr>
+    `;
+  });
 }
 
 function agregarValorCalculado(vs30) {
