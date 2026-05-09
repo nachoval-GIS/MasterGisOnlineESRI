@@ -1,151 +1,174 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Visor Geotécnico Pro | TFM</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <aside class="sidebar">
+    <div class="university-logo">
+      <img src="UGR-Logo.png" alt="Logo Universidad de Granada" />
+    </div>
+
+    <div class="sidebar-header">
+      <i class="fas fa-mountain-sun"></i>
+      <h1>VISOR <span>GEOTÉCNICO</span></h1>
+    </div>
+
+    <div class="panel-container">
+      <section class="panel">
+        <h3><i class="fas fa-calculator"></i> Calculadora Vs30</h3>
+
+        <div class="formula-badge">
+          Vs30 = 259.24 · (N<sub>60</sub>)<sup>0.05</sup>
+        </div>
+
+        <div class="input-group">
+          <label for="normativa">Normativa sísmica</label>
+          <select id="normativa">
+            <option value="ncsr02">NCSR-02</option>
+            <option value="ec8">Eurocódigo 8</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="n60">N (SPT)</label>
+          <input type="number" id="n60" placeholder="Ej. 30" min="0" step="0.01" />
+        </div>
+
+        <button type="button" onclick="calcularVs30()" class="btn-primary">
+          Calcular Vs30
+        </button>
+
+        <p id="resultadoVs30" class="result-display"></p>
+      </section>
+
+      <section class="panel">
+        <h3><i class="fas fa-wave-square"></i> Calculadora Gmax</h3>
+
+        <div class="formula-badge">
+          Gmax = ρ · Vs30²
+        </div>
+
+        <div class="input-group">
+          <label for="densidad">Densidad (ρ)</label>
+          <input type="number" id="densidad" placeholder="kg/m³" min="0" step="0.01" />
+        </div>
+
+        <div class="input-group">
+          <label for="vs30gmax">Vs30 (m/s)</label>
+          <input type="number" id="vs30gmax" placeholder="m/s" min="0" step="0.01" />
+        </div>
+
+        <button type="button" onclick="calcularGmax()" class="btn-secondary">
+          Calcular Gmax
+        </button>
+
+        <p id="resultadoGmax" class="result-display"></p>
+      </section>
+
+      <section class="panel">
+        <h3><i class="fas fa-layer-group"></i> Tipo de suelo</h3>
+
+        <select id="suelo" class="custom-select">
+          <option value="granular">Suelo granular</option>
+          <option value="cohesivo">Suelo cohesivo</option>
+          <option value="noclasificado">Zona no clasificada</option>
+        </select>
+      </section>
+
+      <section class="panel stats-panel">
+        <h3><i class="fas fa-chart-pie"></i> Estadísticas globales</h3>
+
+        <div id="stats">
+          Cargando estadísticas...
+        </div>
+      </section>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="main-header">
+      <div>
+        <h2>Análisis de Velocidad de Onda de Corte</h2>
+        <p class="subtitle">
+          Estimación de parámetros geotécnicos mediante correlaciones SPT-Vs30 y cálculo dinámico de Gmax
+        </p>
+      </div>
+    </header>
+
+    <section class="chart-section">
+      <div class="chart-header">
+        <div>
+          <h3>Distribución de Vs30 por sondeo</h3>
+          <p>
+            Representación comparativa de la velocidad media de onda de corte en los puntos analizados.
+          </p>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <canvas id="graficaVs30"></canvas>
+      </div>
+
+      <div class="chart-legend-vs30" aria-label="Leyenda de rangos Vs30">
+        <span><i class="legend-red"></i> Vs30 &lt; 180 m/s</span>
+        <span><i class="legend-orange"></i> 180–360 m/s</span>
+        <span><i class="legend-blue"></i> 360–800 m/s</span>
+        <span><i class="legend-green"></i> &gt; 800 m/s</span>
+      </div>
+    </section>
+
+    <section class="table-container">
+      <h3>Resultados de los sondeos</h3>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>ID sondeo</th>
+              <th>Tipo de suelo</th>
+              <th>Vs30 (m/s)</th>
+              <th>Clase sísmica</th>
+              <th>Gmax</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+
+          <tbody id="tablaSondeos">
+            <tr>
+              <td colspan="6">Cargando datos...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="map-container">
+      <iframe
+        src="https://experience.arcgis.com/experience/af3386a8a28344b8a1bcde6b578336f2"
+        width="100%"
+        height="700"
+        frameborder="0"
+        allowfullscreen
+        title="Experience Builder - Visor Geotécnico Santa Fe">
+      </iframe>
+    </section>
+
+    <footer class="footer">
+      TFM Máster GIS · Ignacio Valverde Palacios · 2026
+    </footer>
+  </main>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-
-<aside class="sidebar">
-  <div class="university-logo">
-    <img src="UGR-Logo.png" alt="Logo Universidad de Granada">
-  </div>
-
-  <div class="sidebar-header">
-    <i class="fas fa-mountain-sun"></i>
-    <h1>VISOR <span>GEOTÉCNICO</span></h1>
-  </div>
-  
-  <div class="panel">
-    <h3><i class="fa-solid fa-scale-balanced"></i> Normativa sísmica</h3>
-
-    <select id="normativa">
-      <option value="ncsr02">NCSR-02</option>
-      <option value="ec8">Eurocódigo 8</option>
-    </select>
-  </div>
-      <div class="input-group">
-        <label for="n60">N (SPT)</label>
-        <input type="number" id="n60" placeholder="Ej. 30">
-      </div>
-      <button onclick="calcularVs30()" class="btn-primary">Calcular Vs30</button>
-      <p id="resultadoVs30" class="result-display"></p>
-    </section>
-
-    <section class="panel">
-      <h3><i class="fas fa-wave-square"></i> Calculadora Gmax</h3>
-      <div class="formula-badge">Gmax = ρ · Vs30²</div>
-      <div class="input-group">
-        <label>Densidad (ρ)</label>
-        <input type="number" id="densidad" placeholder="kg/m³">
-      </div>
-      <div class="input-group">
-        <label>Vs30 (m/s)</label>
-        <input type="number" id="vs30gmax" placeholder="m/s">
-      </div>
-      <button onclick="calcularGmax()" class="btn-secondary">Calcular Gmax</button>
-      <p id="resultadoGmax" class="result-display"></p>
-    </section>
-
-    <section class="panel">
-      <h3><i class="fas fa-layer-group"></i> Tipo de Suelo</h3>
-      <select id="suelo" onchange="actualizarGrafica()" class="custom-select">
-        <option value="granular">Suelo Granular</option>
-        <option value="cohesivo">Suelo Cohesivo</option>
-        <option value="noclasificado">Zona no clasificada</option>
-      </select>
-    </section>
-
-    <div class="panel">
-  <h3><i class="fa-solid fa-chart-pie"></i> Estadísticas Globales</h3>
-
-  <div id="stats">
-    Cargando estadísticas...
-  </div>
-</div>
-</aside>
-
-<main class="main-content">
-  <header class="main-header">
-
-    <div>
-      <h2>Análisis de Velocidad de Onda de Corte</h2>
-
-      <p class="subtitle">
-        Estimación de parámetros geotécnicos mediante correlaciones SPT-Vs30 y cálculo dinámico de Gmax
-      </p>
-    </div>
-
-  </header>
-
-  <div class="chart-container">
-    <canvas id="graficaVs30"></canvas>
-  </div>
-  <div class="table-container">
-  <h3>Tabla dinámica de sondeos</h3>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Sondeo</th>
-        <th>Tipo</th>
-        <th>Vs30</th>
-        <th>Gmax</th>
-        <th>Estado</th>
-      </tr>
-    </thead>
-
-    <tbody id="tablaSondeos">
-      <tr>
-        <td colspan="5">Cargando datos...</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-<section class="chart-section">
-  <div class="chart-header">
-    <div>
-      <h3>Distribución de Vs30 por sondeo</h3>
-      <p>Representación comparativa de la velocidad media de onda de corte en los puntos analizados.</p>
-    </div>
-  </div>
-
-  <div class="chart-container">
-  <canvas id="graficaVs30"></canvas>
-</div>
-
-<div class="chart-legend-vs30">
-  <span><i class="legend-red"></i> Vs30 &lt; 180 m/s</span>
-  <span><i class="legend-orange"></i> 180–360 m/s</span>
-  <span><i class="legend-blue"></i> 360–800 m/s</span>
-  <span><i class="legend-green"></i> &gt; 800 m/s</span>
-</div>
-</section>
-<div class="map-container">
-  <div class="map-container">
-  <iframe
-    src="https://experience.arcgis.com/experience/af3386a8a28344b8a1bcde6b578336f2"
-    width="100%"
-    height="700"
-    frameborder="0"
-    allowfullscreen>
-  </iframe>
-</div>
-
-<footer class="footer">
-  TFM Máster GIS · Ignacio Valverde Palacios · 2026
-</footer>
-
-</main>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
