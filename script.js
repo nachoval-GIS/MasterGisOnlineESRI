@@ -141,22 +141,74 @@ graficaVs30 = new Chart(ctx, {
     datasets: [{
       label: "Vs30",
       data: [],
-      backgroundColor: "rgba(67, 160, 71, 0.6)"
+      backgroundColor: [],
+      borderColor: [],
+      borderWidth: 1.5,
+      borderRadius: 8,
+      maxBarThickness: 42
     }]
   },
   options: {
     responsive: true,
+    maintainAspectRatio: false,
+    interaction: {
+      mode: "index",
+      intersect: false
+    },
     plugins: {
       legend: {
-        display: true
+        display: true,
+        position: "top",
+        labels: {
+          usePointStyle: true,
+          boxWidth: 10,
+          color: "#334155",
+          font: {
+            size: 13,
+            weight: "600"
+          }
+        }
+      },
+      tooltip: {
+        backgroundColor: "rgba(15, 23, 42, 0.92)",
+        titleColor: "#ffffff",
+        bodyColor: "#e2e8f0",
+        padding: 12,
+        cornerRadius: 10,
+        callbacks: {
+          label: function(context) {
+            return "Vs30: " + context.raw.toFixed(2) + " m/s";
+          }
+        }
       }
     },
     scales: {
+      x: {
+        ticks: {
+          color: "#475569",
+          maxRotation: 60,
+          minRotation: 0
+        },
+        grid: {
+          display: false
+        }
+      },
       y: {
         beginAtZero: true,
         title: {
           display: true,
-          text: "Vs30 (m/s)"
+          text: "Vs30 m/s",
+          color: "#334155",
+          font: {
+            size: 13,
+            weight: "700"
+          }
+        },
+        ticks: {
+          color: "#475569"
+        },
+        grid: {
+          color: "rgba(148, 163, 184, 0.25)"
         }
       }
     }
