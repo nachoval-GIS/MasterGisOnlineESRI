@@ -288,6 +288,45 @@ th, td{
 tbody tr:hover{
   background: #f1f5f9;
 }
+
+.chart-legend-vs30 {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 18px;
+  font-size: 0.9rem;
+  color: #475569;
+}
+
+.chart-legend-vs30 span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.chart-legend-vs30 i {
+  width: 13px;
+  height: 13px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.legend-red {
+  background: rgba(220, 38, 38, 0.85);
+}
+
+.legend-orange {
+  background: rgba(245, 158, 11, 0.85);
+}
+
+.legend-blue {
+  background: rgba(37, 99, 235, 0.85);
+}
+
+.legend-green {
+  background: rgba(22, 163, 74, 0.85);
+}
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
