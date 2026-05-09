@@ -1,224 +1,15 @@
 let sondeos = [];
-let graficaVs30;
+let graficaVs30 = null;
 
-async function cargarSondeos() {
-  const respuesta = await fetch("sondeos.json");
-  sondeos = await respuesta.json();
+const VERSION_DATOS = "v=11";
 
-  actualizarGrafica();
-  actualizarEstadisticas();
-}
-
-function calcularVs30() {
-  let n60 = parseFloat(document.getElementById("n60").value);
-
-  if (isNaN(n60) || n60 <= 0) {
-    document.getElementById("resultadoVs30").innerHTML =
-      "Introduce un valor N válido.";
-    return;
-  }
-
-  let vs30 = 259.24 * Math.pow(n60, 0.05);
-  let clase = clasificarVs30(vs30);
-
-  document.getElementById("resultadoVs30").innerHTML =
-    "Vs30 = " + vs30.toFixed(2) + " m/s<br>" +
-    "Clasificación sísmica: " + clase;
-
-  document.getElementById("vs30gmax").value = vs30.toFixed(2);
-
-  agregarValorCalculado(vs30);
-}
-
-function calcularGmax() {
-  let densidad = parseFloat(document.getElementById("densidad").value);
-  let vs30 = parseFloat(document.getElementById("vs30gmax").value);
-
-  if (isNaN(densidad) || isNaN(vs30)) {
-    document.getElementById("resultadoGmax").innerHTML =
-      "Introduce densidad y Vs30 válidos.";
-    return;
-  }
-
-  let gmax = densidad * Math.pow(vs30, 2);
-
-  document.getElementById("resultadoGmax").innerHTML =
-    "Gmax = " + gmax.toLocaleString("es-ES", {
-      maximumFractionDigits: 2
-    });
-}
-
-function clasificarVs30(vs30) {
-  let normativa = document.getElementById("normativa").value;
-
-  if (normativa === "ncsr02") {
-    if (vs30 > 750) return "Tipo A";
-    if (vs30 >= 360) return "Tipo B";
-    if (vs30 >= 180) return "Tipo C";
-    return "Tipo D";
-  }
-
-  if (normativa === "ec8") {
-    if (vs30 > 800) return "Clase A";
-    if (vs30 >= 360) return "Clase B";
-    if (vs30 >= 180) return "Clase C";
-    return "Clase D";
-  }
-}
-
-function actualizarGrafica() {
-  let tipo = document.getElementById("suelo").value;
-
-  let datosFiltrados = sondeos
-    .filter(s => s.tipo === tipo)
-    .sort((a, b) => a.vs30 - b.vs30);
-
-  let labels = datosFiltrados.map(s => "Sondeo " + s.id);
-  let valores = datosFiltrados.map(s => s.vs30);
-
-  let etiquetas = {
-    granular: "Vs30 - Suelo granular",
-    cohesivo: "Vs30 - Suelo cohesivo",
-    noclasificado: "Vs30 - Zona no clasificada"
-  };
-
-  let coloresVs30 = valores.map(v => obtenerColorVs30(v));
-  let bordesVs30 = coloresVs30.map(color => color.replace("0.85", "1"));
-
-  graficaVs30.data.labels = labels;
-  graficaVs30.data.datasets[0].label = etiquetas[tipo];
-  graficaVs30.data.datasets[0].data = valores;
-  graficaVs30.data.datasets[0].backgroundColor = coloresVs30;
-  graficaVs30.data.datasets[0].borderColor = bordesVs30;
-
-  actualizarTabla(datosFiltrados);
-  graficaVs30.update();
-}
-
-function actualizarTabla(datos) {
-  const tabla = document.getElementById("tablaSondeos");
-
-  tabla.innerHTML = "";
-
-  datos.forEach(s => {
-    tabla.innerHTML += `
-      <tr>
-        <td>Sondeo ${s.id}</td>
-        <td>${s.tipo}</td>
-        <td>${s.vs30.toFixed(2)} m/s</td>
-        <td>${s.gmax.toLocaleString("es-ES", { maximumFractionDigits: 2 })}</td>
-        <td>${s.estado}</td>
-      </tr>
-    `;
-  });
-}
-
-function agregarValorCalculado(vs30) {
-  let valor = Number(vs30.toFixed(2));
-  let color = obtenerColorVs30(valor);
-
-  graficaVs30.data.labels.push("Calculado");
-  graficaVs30.data.datasets[0].data.push(valor);
-  graficaVs30.data.datasets[0].backgroundColor.push(color);
-  graficaVs30.data.datasets[0].borderColor.push(color.replace("0.85", "1"));
-
-  graficaVs30.update();
-}
-
-function actualizarEstadisticas() {
-  const total = sondeos.length;
-  const mediaVs30 = sondeos.reduce((acc, s) => acc + s.vs30, 0) / total;
-  const mediaGmax = sondeos.reduce((acc, s) => acc + s.gmax, 0) / total;
-
-  document.getElementById("stats").innerHTML =
-    "Sondeos Realizados <strong>" + total + "</strong><br>" +
-    "Vs30 Promedio <strong>" + mediaVs30.toFixed(2) + " m/s</strong><br>" +
-    "Gmax Promedio <strong>" + mediaGmax.toLocaleString("es-ES", {
-      maximumFractionDigits: 2
-    }) + "</strong>";
-}
-
-const ctx = document.getElementById("graficaVs30");
-
-graficaVs30 = new Chart(ctx, {
-  type: "bar",
-  data: {
-    labels: [],
-    datasets: [{
-      label: "Vs30",
-      data: [],
-      backgroundColor: [],
-      borderColor: [],
-      borderWidth: 1.5,
-      borderRadius: 8,
-      maxBarThickness: 42
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: {
-      mode: "index",
-      intersect: false
-    },
-    plugins: {
-      legend: {
-        display: true,
-        position: "top",
-        labels: {
-          usePointStyle: true,
-          boxWidth: 10,
-          color: "#334155",
-          font: {
-            size: 13,
-            weight: "600"
-          }
-        }
-      },
-      tooltip: {
-        backgroundColor: "rgba(15, 23, 42, 0.92)",
-        titleColor: "#ffffff",
-        bodyColor: "#e2e8f0",
-        padding: 12,
-        cornerRadius: 10,
-        callbacks: {
-          label: function(context) {
-            return "Vs30: " + context.raw.toFixed(2) + " m/s";
-          }
-        }
-      }
-    },
-    scales: {
-      x: {
-        ticks: {
-          color: "#475569",
-          maxRotation: 60,
-          minRotation: 0
-        },
-        grid: {
-          display: false
-        }
-      },
-      y: {
-        beginAtZero: true,
-        title: {
-          display: true,
-          text: "Vs30 m/s",
-          color: "#334155",
-          font: {
-            size: 13,
-            weight: "700"
-          }
-        },
-        ticks: {
-          color: "#475569"
-        },
-        grid: {
-          color: "rgba(148, 163, 184, 0.25)"let sondeos = [];
-let graficaVs30;
+/* =========================================================
+   PLUGIN: LÍNEA HORIZONTAL DE UMBRAL Vs30 = 360 m/s
+========================================================= */
 
 const umbralVs30Plugin = {
   id: "umbralVs30Plugin",
+
   afterDatasetsDraw(chart) {
     const { ctx, chartArea, scales } = chart;
     const yScale = scales.y;
@@ -231,6 +22,7 @@ const umbralVs30Plugin = {
     if (y < chartArea.top || y > chartArea.bottom) return;
 
     ctx.save();
+
     ctx.beginPath();
     ctx.setLineDash([6, 6]);
     ctx.strokeStyle = "rgba(15, 23, 42, 0.45)";
@@ -243,13 +35,18 @@ const umbralVs30Plugin = {
     ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
     ctx.font = "600 12px Inter, sans-serif";
     ctx.fillText("Umbral 360 m/s", chartArea.left + 8, y - 8);
+
     ctx.restore();
   }
 };
 
+/* =========================================================
+   CARGA DE DATOS
+========================================================= */
+
 async function cargarSondeos() {
   try {
-    const respuesta = await fetch("sondeos.json");
+    const respuesta = await fetch(`./sondeos.json?${VERSION_DATOS}`);
 
     if (!respuesta.ok) {
       throw new Error("No se pudo cargar sondeos.json");
@@ -257,61 +54,89 @@ async function cargarSondeos() {
 
     sondeos = await respuesta.json();
 
+    console.log("Sondeos cargados correctamente:", sondeos);
+
     actualizarGrafica();
     actualizarEstadisticas();
+
   } catch (error) {
-    console.error(error);
+    console.error("Error cargando sondeos.json:", error);
 
     const tabla = document.getElementById("tablaSondeos");
-    tabla.innerHTML = `
-      <tr>
-        <td colspan="6">
-          No se han podido cargar los datos. Abre el proyecto con Live Server o revisa sondeos.json.
-        </td>
-      </tr>
-    `;
+
+    if (tabla) {
+      tabla.innerHTML = `
+        <tr>
+          <td colspan="6">
+            No se han podido cargar los datos. Revisa que el archivo <strong>sondeos.json</strong>
+            esté en la misma carpeta que <strong>index.html</strong> y que el nombre esté escrito exactamente igual.
+          </td>
+        </tr>
+      `;
+    }
+
+    const stats = document.getElementById("stats");
+
+    if (stats) {
+      stats.innerHTML = "No se han podido cargar las estadísticas.";
+    }
   }
 }
 
+/* =========================================================
+   CALCULADORA Vs30
+========================================================= */
+
 function calcularVs30() {
-  const n60 = parseFloat(document.getElementById("n60").value);
+  const inputN60 = document.getElementById("n60");
+  const resultado = document.getElementById("resultadoVs30");
+  const inputVs30Gmax = document.getElementById("vs30gmax");
+
+  const n60 = parseFloat(inputN60.value);
 
   if (isNaN(n60) || n60 <= 0) {
-    document.getElementById("resultadoVs30").innerHTML =
-      "Introduce un valor N válido.";
+    resultado.innerHTML = "Introduce un valor N válido.";
     return;
   }
 
   const vs30 = 259.24 * Math.pow(n60, 0.05);
   const clase = clasificarVs30(vs30);
 
-  document.getElementById("resultadoVs30").innerHTML =
+  resultado.innerHTML =
     "Vs30 = " + vs30.toFixed(2) + " m/s<br>" +
     "Clasificación sísmica: " + clase;
 
-  document.getElementById("vs30gmax").value = vs30.toFixed(2);
+  inputVs30Gmax.value = vs30.toFixed(2);
 
   agregarValorCalculado(vs30);
 }
 
+/* =========================================================
+   CALCULADORA Gmax
+========================================================= */
+
 function calcularGmax() {
   const densidad = parseFloat(document.getElementById("densidad").value);
   const vs30 = parseFloat(document.getElementById("vs30gmax").value);
+  const resultado = document.getElementById("resultadoGmax");
 
   if (isNaN(densidad) || densidad <= 0 || isNaN(vs30) || vs30 <= 0) {
-    document.getElementById("resultadoGmax").innerHTML =
-      "Introduce densidad y Vs30 válidos.";
+    resultado.innerHTML = "Introduce densidad y Vs30 válidos.";
     return;
   }
 
   const gmax = densidad * Math.pow(vs30, 2);
 
-  document.getElementById("resultadoGmax").innerHTML =
-    "Gmax = " + formatearNumero(gmax);
+  resultado.innerHTML = "Gmax = " + formatearNumero(gmax);
 }
 
+/* =========================================================
+   CLASIFICACIÓN Vs30
+========================================================= */
+
 function clasificarVs30(vs30) {
-  const normativa = document.getElementById("normativa").value;
+  const normativaSelect = document.getElementById("normativa");
+  const normativa = normativaSelect ? normativaSelect.value : "ncsr02";
 
   if (normativa === "ncsr02") {
     if (vs30 > 750) return "Tipo A";
@@ -346,12 +171,139 @@ function obtenerColorVs30(vs30) {
   return "rgba(220, 38, 38, 0.85)";
 }
 
+/* =========================================================
+   GRÁFICA
+========================================================= */
+
+function inicializarGrafica() {
+  const canvas = document.getElementById("graficaVs30");
+
+  if (!canvas) {
+    console.error("No se ha encontrado el canvas con id graficaVs30.");
+    return;
+  }
+
+  if (typeof Chart === "undefined") {
+    console.error("Chart.js no se ha cargado. Revisa el script de Chart.js en index.html.");
+    return;
+  }
+
+  graficaVs30 = new Chart(canvas, {
+    type: "bar",
+
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: "Vs30",
+          data: [],
+          backgroundColor: [],
+          borderColor: [],
+          borderWidth: 1.5,
+          borderRadius: 8,
+          maxBarThickness: 48
+        }
+      ]
+    },
+
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+
+      interaction: {
+        mode: "index",
+        intersect: false
+      },
+
+      plugins: {
+        legend: {
+          display: true,
+          position: "top",
+          labels: {
+            usePointStyle: true,
+            pointStyle: "circle",
+            boxWidth: 10,
+            color: "#334155",
+            font: {
+              size: 13,
+              weight: "700"
+            }
+          }
+        },
+
+        tooltip: {
+          backgroundColor: "rgba(15, 23, 42, 0.92)",
+          titleColor: "#ffffff",
+          bodyColor: "#e2e8f0",
+          padding: 12,
+          cornerRadius: 10,
+          callbacks: {
+            label: function(context) {
+              const valor = Number(context.raw);
+              return "Vs30: " + valor.toFixed(2) + " m/s";
+            }
+          }
+        }
+      },
+
+      scales: {
+        x: {
+          ticks: {
+            color: "#475569",
+            maxRotation: 45,
+            minRotation: 0
+          },
+          grid: {
+            display: false
+          }
+        },
+
+        y: {
+          beginAtZero: true,
+          suggestedMax: 450,
+          title: {
+            display: true,
+            text: "Vs30 m/s",
+            color: "#334155",
+            font: {
+              size: 13,
+              weight: "700"
+            }
+          },
+          ticks: {
+            color: "#475569"
+          },
+          grid: {
+            color: "rgba(148, 163, 184, 0.25)"
+          }
+        }
+      }
+    },
+
+    plugins: [umbralVs30Plugin]
+  });
+}
+
 function actualizarGrafica() {
-  const tipo = document.getElementById("suelo").value;
+  const selectorSuelo = document.getElementById("suelo");
+
+  if (!selectorSuelo) {
+    console.error("No se ha encontrado el selector con id suelo.");
+    return;
+  }
+
+  const tipo = selectorSuelo.value;
 
   const datosFiltrados = sondeos
     .filter(s => s.tipo === tipo)
     .sort((a, b) => a.vs30 - b.vs30);
+
+  actualizarTabla(datosFiltrados);
+
+  if (!graficaVs30) {
+    console.warn("La gráfica todavía no está inicializada.");
+    return;
+  }
 
   const labels = datosFiltrados.map(s => "Sondeo " + s.id);
   const valores = datosFiltrados.map(s => s.vs30);
@@ -371,36 +323,7 @@ function actualizarGrafica() {
   graficaVs30.data.datasets[0].backgroundColor = coloresVs30;
   graficaVs30.data.datasets[0].borderColor = bordesVs30;
 
-  actualizarTabla(datosFiltrados);
   graficaVs30.update();
-}
-
-function actualizarTabla(datos) {
-  const tabla = document.getElementById("tablaSondeos");
-
-  tabla.innerHTML = "";
-
-  if (datos.length === 0) {
-    tabla.innerHTML = `
-      <tr>
-        <td colspan="6">No hay sondeos para el tipo de suelo seleccionado.</td>
-      </tr>
-    `;
-    return;
-  }
-
-  datos.forEach(s => {
-    tabla.innerHTML += `
-      <tr>
-        <td>Sondeo ${s.id}</td>
-        <td>${capitalizar(s.tipo)}</td>
-        <td>${s.vs30.toFixed(2)} m/s</td>
-        <td>${clasificarVs30(s.vs30)}</td>
-        <td>${formatearNumero(s.gmax)}</td>
-        <td>${s.estado}</td>
-      </tr>
-    `;
-  });
 }
 
 function agregarValorCalculado(vs30) {
@@ -417,26 +340,77 @@ function agregarValorCalculado(vs30) {
   graficaVs30.update();
 }
 
-function actualizarEstadisticas() {
-  const total = sondeos.length;
+/* =========================================================
+   TABLA
+========================================================= */
 
-  if (total === 0) {
-    document.getElementById("stats").innerHTML =
-      "No hay sondeos cargados.";
+function actualizarTabla(datos) {
+  const tabla = document.getElementById("tablaSondeos");
+
+  if (!tabla) {
+    console.error("No se ha encontrado la tabla con id tablaSondeos.");
     return;
   }
 
-  const mediaVs30 = sondeos.reduce((acc, s) => acc + s.vs30, 0) / total;
-  const mediaGmax = sondeos.reduce((acc, s) => acc + s.gmax, 0) / total;
+  tabla.innerHTML = "";
 
-  document.getElementById("stats").innerHTML =
+  if (!datos || datos.length === 0) {
+    tabla.innerHTML = `
+      <tr>
+        <td colspan="6">No hay sondeos para el tipo de suelo seleccionado.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  datos.forEach(s => {
+    tabla.innerHTML += `
+      <tr>
+        <td>Sondeo ${s.id}</td>
+        <td>${capitalizar(s.tipo)}</td>
+        <td>${Number(s.vs30).toFixed(2)} m/s</td>
+        <td>${clasificarVs30(Number(s.vs30))}</td>
+        <td>${formatearNumero(Number(s.gmax))}</td>
+        <td>${s.estado}</td>
+      </tr>
+    `;
+  });
+}
+
+/* =========================================================
+   ESTADÍSTICAS
+========================================================= */
+
+function actualizarEstadisticas() {
+  const stats = document.getElementById("stats");
+
+  if (!stats) {
+    console.error("No se ha encontrado el contenedor con id stats.");
+    return;
+  }
+
+  const total = sondeos.length;
+
+  if (total === 0) {
+    stats.innerHTML = "No hay sondeos cargados.";
+    return;
+  }
+
+  const mediaVs30 = sondeos.reduce((acc, s) => acc + Number(s.vs30), 0) / total;
+  const mediaGmax = sondeos.reduce((acc, s) => acc + Number(s.gmax), 0) / total;
+
+  stats.innerHTML =
     "Sondeos realizados <strong>" + total + "</strong><br>" +
     "Vs30 promedio <strong>" + mediaVs30.toFixed(2) + " m/s</strong><br>" +
     "Gmax promedio <strong>" + formatearNumero(mediaGmax) + "</strong>";
 }
 
+/* =========================================================
+   UTILIDADES
+========================================================= */
+
 function formatearNumero(valor) {
-  return valor.toLocaleString("es-ES", {
+  return Number(valor).toLocaleString("es-ES", {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2
   });
@@ -447,102 +421,24 @@ function capitalizar(texto) {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
-function inicializarGrafica() {
-  const ctx = document.getElementById("graficaVs30");
+/* =========================================================
+   INICIO DE LA APLICACIÓN
+========================================================= */
 
-  graficaVs30 = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: [],
-      datasets: [
-        {
-          label: "Vs30",
-          data: [],
-          backgroundColor: [],
-          borderColor: [],
-          borderWidth: 1.5,
-          borderRadius: 8,
-          maxBarThickness: 48
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: {
-        mode: "index",
-        intersect: false
-      },
-      plugins: {
-        legend: {
-          display: true,
-          position: "top",
-          labels: {
-            usePointStyle: true,
-            pointStyle: "circle",
-            boxWidth: 10,
-            color: "#334155",
-            font: {
-              size: 13,
-              weight: "700"
-            }
-          }
-        },
-        tooltip: {
-          backgroundColor: "rgba(15, 23, 42, 0.92)",
-          titleColor: "#ffffff",
-          bodyColor: "#e2e8f0",
-          padding: 12,
-          cornerRadius: 10,
-          callbacks: {
-            label: function(context) {
-              const valor = Number(context.raw);
-              return "Vs30: " + valor.toFixed(2) + " m/s";
-            }
-          }
-        }
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: "#475569",
-            maxRotation: 45,
-            minRotation: 0
-          },
-          grid: {
-            display: false
-          }
-        },
-        y: {
-          beginAtZero: true,
-          suggestedMax: 420,
-          title: {
-            display: true,
-            text: "Vs30 m/s",
-            color: "#334155",
-            font: {
-              size: 13,
-              weight: "700"
-            }
-          },
-          ticks: {
-            color: "#475569"
-          },
-          grid: {
-            color: "rgba(148, 163, 184, 0.25)"
-          }
-        }
-      }
-    },
-    plugins: [umbralVs30Plugin]
-  });
-}
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("script.js cargado correctamente.");
 
-document.getElementById("suelo").addEventListener("change", actualizarGrafica);
+  const selectorSuelo = document.getElementById("suelo");
+  const selectorNormativa = document.getElementById("normativa");
 
-document.getElementById("normativa").addEventListener("change", () => {
-  actualizarGrafica();
+  if (selectorSuelo) {
+    selectorSuelo.addEventListener("change", actualizarGrafica);
+  }
+
+  if (selectorNormativa) {
+    selectorNormativa.addEventListener("change", actualizarGrafica);
+  }
+
+  inicializarGrafica();
+  cargarSondeos();
 });
-
-inicializarGrafica();
-cargarSondeos();
