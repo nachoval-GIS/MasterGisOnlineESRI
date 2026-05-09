@@ -69,16 +69,12 @@ function clasificarVs30(vs30) {
 function actualizarGrafica() {
   let tipo = document.getElementById("suelo").value;
 
-  let datosFiltrados = sondeos.filter(s => s.tipo === tipo);
+  let datosFiltrados = sondeos
+    .filter(s => s.tipo === tipo)
+    .sort((a, b) => a.vs30 - b.vs30);
 
   let labels = datosFiltrados.map(s => "Sondeo " + s.id);
   let valores = datosFiltrados.map(s => s.vs30);
-
-  let colores = {
-    granular: "rgba(67, 160, 71, 0.6)",
-    cohesivo: "rgba(251, 140, 0, 0.6)",
-    noclasificado: "rgba(120, 120, 120, 0.6)"
-  };
 
   let etiquetas = {
     granular: "Vs30 - Suelo granular",
@@ -86,10 +82,14 @@ function actualizarGrafica() {
     noclasificado: "Vs30 - Zona no clasificada"
   };
 
+  let coloresVs30 = valores.map(v => obtenerColorVs30(v));
+  let bordesVs30 = coloresVs30.map(color => color.replace("0.85", "1"));
+
   graficaVs30.data.labels = labels;
   graficaVs30.data.datasets[0].label = etiquetas[tipo];
   graficaVs30.data.datasets[0].data = valores;
-  graficaVs30.data.datasets[0].backgroundColor = colores[tipo];
+  graficaVs30.data.datasets[0].backgroundColor = coloresVs30;
+  graficaVs30.data.datasets[0].borderColor = bordesVs30;
 
   actualizarTabla(datosFiltrados);
   graficaVs30.update();
