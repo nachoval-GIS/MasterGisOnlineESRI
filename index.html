@@ -22,13 +22,35 @@
     <i class="fas fa-mountain-sun"></i>
     <h1>VISOR <span>GEOTÉCNICO</span></h1>
   </div>
+  <div class="table-container">
+  <h3>Tabla dinámica de sondeos</h3>
 
+  <table>
+    <thead>
+      <tr>
+        <th>Sondeo</th>
+        <th>Tipo</th>
+        <th>Vs30</th>
+        <th>Gmax</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+
+    <tbody id="tablaSondeos">
+      <tr>
+        <td colspan="5">Cargando datos...</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
   <div class="panel-container">
     <section class="panel">
       <h3><i class="fas fa-calculator"></i> Calculadora Vs30</h3>
       <div class="formula-badge">
         Vs30 = 259.24 · (N<sub>60</sub>)<sup>0.05</sup>
       </div>
+  
+  
   <div class="panel">
     <h3><i class="fa-solid fa-scale-balanced"></i> Normativa sísmica</h3>
 
