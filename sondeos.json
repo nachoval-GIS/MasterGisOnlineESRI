@@ -3,7 +3,7 @@
     "id": "56",
     "tipo": "granular",
     "vs30": 290.87,
-    "gmax": 152291.80,
+    "gmax": 152291.8,
     "estado": "Revisado"
   },
   {
@@ -44,29 +44,29 @@
   {
     "id": "207",
     "tipo": "cohesivo",
-    "vs30": 299.10,
-    "gmax": 161200.00,
+    "vs30": 299.1,
+    "gmax": 161200,
     "estado": "Revisado"
   },
   {
     "id": "208",
     "tipo": "cohesivo",
-    "vs30": 301.20,
-    "gmax": 163450.00,
+    "vs30": 301.2,
+    "gmax": 163450,
     "estado": "Revisado"
   },
   {
     "id": "209",
     "tipo": "cohesivo",
-    "vs30": 297.80,
-    "gmax": 159900.00,
+    "vs30": 297.8,
+    "gmax": 159900,
     "estado": "Revisado"
   },
   {
     "id": "300",
     "tipo": "cohesivo",
-    "vs30": 296.40,
-    "gmax": 158700.00,
+    "vs30": 296.4,
+    "gmax": 158700,
     "estado": "Revisado"
   }
 ]
