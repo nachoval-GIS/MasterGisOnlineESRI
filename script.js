@@ -1,3 +1,14 @@
+let sondeos = [];
+let graficaVs30;
+
+async function cargarSondeos() {
+  const respuesta = await fetch("sondeos.json");
+  sondeos = await respuesta.json();
+
+  actualizarGrafica();
+  actualizarEstadisticas();
+}
+
 function calcularVs30() {
   let n60 = parseFloat(document.getElementById("n60").value);
 
@@ -8,7 +19,6 @@ function calcularVs30() {
   }
 
   let vs30 = 259.24 * Math.pow(n60, 0.05);
-
   let clase = clasificarVs30(vs30);
 
   document.getElementById("resultadoVs30").innerHTML =
@@ -18,29 +28,6 @@ function calcularVs30() {
   document.getElementById("vs30gmax").value = vs30.toFixed(2);
 
   agregarValorCalculado(vs30);
-}
-
- function clasificarVs30(vs30) {
-  let normativa = document.getElementById("normativa").value;
-
-  if (normativa === "ncsr02") {
-    if (vs30 > 750) return "Tipo A";
-    if (vs30 >= 360) return "Tipo B";
-    if (vs30 >= 180) return "Tipo C";
-    return "Tipo D";
-  }
-
-  if (normativa === "ec8") {
-    if (vs30 > 800) return "Clase A";
-    if (vs30 >= 360) return "Clase B";
-    if (vs30 >= 180) return "Clase C";
-    return "Clase D";
-  }
-}
-function agregarValorCalculado(vs30) {
-  graficaVs30.data.labels.push("Calculado");
-  graficaVs30.data.datasets[0].data.push(vs30.toFixed(2));
-  graficaVs30.update();
 }
 
 function calcularGmax() {
@@ -58,40 +45,84 @@ function calcularGmax() {
   document.getElementById("resultadoGmax").innerHTML =
     "Gmax = " + gmax.toLocaleString("es-ES", {
       maximumFractionDigits: 2
-    }) + " T/m³";
+    });
 }
 
-const datosSuelos = {
-  granular: {
-    etiqueta: "Vs30 - Suelo granular",
-    labels: ["Sondeo 56", "Sondeo 62", "Sondeo 63", "Sondeo 64", "Sondeo 91"],
-    datos: [295, 305, 315, 300, 310],
-    color: "rgba(67, 160, 71, 0.6)"
-  },
-  cohesivo: {
-    etiqueta: "Vs30 - Suelo cohesivo",
-    labels: ["Sondeo 205", "Sondeo 207", "Sondeo 208", "Sondeo 209", "Sondeo 300"],
-    datos: [240, 255, 265, 250, 260],
-    color: "rgba(251, 140, 0, 0.6)"
-  },
-  noclasificado: {
-    etiqueta: "Vs30 - Zona no clasificada",
-    labels: ["Sondeo 418", "Sondeo 419", "Sondeo 420"],
-    datos: [270, 275, 268],
-    color: "rgba(120, 120, 120, 0.6)"
+function clasificarVs30(vs30) {
+  let normativa = document.getElementById("normativa").value;
+
+  if (normativa === "ncsr02") {
+    if (vs30 > 750) return "Tipo A";
+    if (vs30 >= 360) return "Tipo B";
+    if (vs30 >= 180) return "Tipo C";
+    return "Tipo D";
   }
-};
+
+  if (normativa === "ec8") {
+    if (vs30 > 800) return "Clase A";
+    if (vs30 >= 360) return "Clase B";
+    if (vs30 >= 180) return "Clase C";
+    return "Clase D";
+  }
+}
+
+function actualizarGrafica() {
+  let tipo = document.getElementById("suelo").value;
+
+  let datosFiltrados = sondeos.filter(s => s.tipo === tipo);
+
+  let labels = datosFiltrados.map(s => "Sondeo " + s.id);
+  let valores = datosFiltrados.map(s => s.vs30);
+
+  let colores = {
+    granular: "rgba(67, 160, 71, 0.6)",
+    cohesivo: "rgba(251, 140, 0, 0.6)",
+    noclasificado: "rgba(120, 120, 120, 0.6)"
+  };
+
+  let etiquetas = {
+    granular: "Vs30 - Suelo granular",
+    cohesivo: "Vs30 - Suelo cohesivo",
+    noclasificado: "Vs30 - Zona no clasificada"
+  };
+
+  graficaVs30.data.labels = labels;
+  graficaVs30.data.datasets[0].label = etiquetas[tipo];
+  graficaVs30.data.datasets[0].data = valores;
+  graficaVs30.data.datasets[0].backgroundColor = colores[tipo];
+
+  graficaVs30.update();
+}
+
+function agregarValorCalculado(vs30) {
+  graficaVs30.data.labels.push("Calculado");
+  graficaVs30.data.datasets[0].data.push(Number(vs30.toFixed(2)));
+  graficaVs30.update();
+}
+
+function actualizarEstadisticas() {
+  const total = sondeos.length;
+  const mediaVs30 = sondeos.reduce((acc, s) => acc + s.vs30, 0) / total;
+  const mediaGmax = sondeos.reduce((acc, s) => acc + s.gmax, 0) / total;
+
+  document.getElementById("stats").innerHTML =
+    "Sondeos Realizados <strong>" + total + "</strong><br>" +
+    "Vs30 Promedio <strong>" + mediaVs30.toFixed(2) + " m/s</strong><br>" +
+    "Gmax Promedio <strong>" + mediaGmax.toLocaleString("es-ES", {
+      maximumFractionDigits: 2
+    }) + "</strong>";
+}
 
 const ctx = document.getElementById("graficaVs30");
 
-let graficaVs30 = new Chart(ctx, {
+graficaVs30 = new Chart(ctx, {
   type: "bar",
   data: {
-    labels: datosSuelos.granular.labels,
+    labels: [],
     datasets: [{
-      label: datosSuelos.granular.etiqueta,
-      data: datosSuelos.granular.datos,
-      backgroundColor: datosSuelos.granular.color
+      label: "Vs30",
+      data: [],
+      backgroundColor: "rgba(67, 160, 71, 0.6)"
     }]
   },
   options: {
@@ -113,14 +144,4 @@ let graficaVs30 = new Chart(ctx, {
   }
 });
 
-function actualizarGrafica() {
-  let tipo = document.getElementById("suelo").value;
-  let datos = datosSuelos[tipo];
-
-  graficaVs30.data.labels = datos.labels;
-  graficaVs30.data.datasets[0].label = datos.etiqueta;
-  graficaVs30.data.datasets[0].data = datos.datos;
-  graficaVs30.data.datasets[0].backgroundColor = datos.color;
-
-  graficaVs30.update();
-}
+cargarSondeos();
