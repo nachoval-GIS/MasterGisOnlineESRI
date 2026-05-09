@@ -1,12 +1,9 @@
 let sondeos = [];
 let graficaVs30 = null;
 
-const VERSION_DATOS = "v=11";
+const VERSION_DATOS = "v=25";
 
-/* =========================================================
-   PLUGIN: LÍNEA HORIZONTAL DE UMBRAL Vs30 = 360 m/s
-========================================================= */
-
+/* LÍNEA DE REFERENCIA Vs30 = 360 m/s */
 const umbralVs30Plugin = {
   id: "umbralVs30Plugin",
 
@@ -22,7 +19,6 @@ const umbralVs30Plugin = {
     if (y < chartArea.top || y > chartArea.bottom) return;
 
     ctx.save();
-
     ctx.beginPath();
     ctx.setLineDash([6, 6]);
     ctx.strokeStyle = "rgba(15, 23, 42, 0.45)";
@@ -33,28 +29,24 @@ const umbralVs30Plugin = {
 
     ctx.setLineDash([]);
     ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
-    ctx.font = "600 12px Inter, sans-serif";
+    ctx.font = "600 12px Inter, Arial, sans-serif";
     ctx.fillText("Umbral 360 m/s", chartArea.left + 8, y - 8);
-
     ctx.restore();
   }
 };
 
-/* =========================================================
-   CARGA DE DATOS
-========================================================= */
-
+/* CARGA DE DATOS */
 async function cargarSondeos() {
   try {
-    const respuesta = await fetch(`./sondeos.json?${VERSION_DATOS}`);
+    const respuesta = await fetch(`./sondeos.json?${VERSION_DATOS}`, {
+      cache: "no-store"
+    });
 
     if (!respuesta.ok) {
       throw new Error("No se pudo cargar sondeos.json");
     }
 
     sondeos = await respuesta.json();
-
-    console.log("Sondeos cargados correctamente:", sondeos);
 
     actualizarGrafica();
     actualizarEstadisticas();
@@ -63,36 +55,27 @@ async function cargarSondeos() {
     console.error("Error cargando sondeos.json:", error);
 
     const tabla = document.getElementById("tablaSondeos");
-
     if (tabla) {
       tabla.innerHTML = `
         <tr>
           <td colspan="6">
-            No se han podido cargar los datos. Revisa que el archivo <strong>sondeos.json</strong>
-            esté en la misma carpeta que <strong>index.html</strong> y que el nombre esté escrito exactamente igual.
+            No se han podido cargar los datos. Revisa que sondeos.json esté junto a index.html.
           </td>
         </tr>
       `;
     }
 
     const stats = document.getElementById("stats");
-
     if (stats) {
       stats.innerHTML = "No se han podido cargar las estadísticas.";
     }
   }
 }
 
-/* =========================================================
-   CALCULADORA Vs30
-========================================================= */
-
+/* CALCULADORA Vs30 */
 function calcularVs30() {
-  const inputN60 = document.getElementById("n60");
+  const n60 = parseFloat(document.getElementById("n60").value);
   const resultado = document.getElementById("resultadoVs30");
-  const inputVs30Gmax = document.getElementById("vs30gmax");
-
-  const n60 = parseFloat(inputN60.value);
 
   if (isNaN(n60) || n60 <= 0) {
     resultado.innerHTML = "Introduce un valor N válido.";
@@ -106,15 +89,12 @@ function calcularVs30() {
     "Vs30 = " + vs30.toFixed(2) + " m/s<br>" +
     "Clasificación sísmica: " + clase;
 
-  inputVs30Gmax.value = vs30.toFixed(2);
+  document.getElementById("vs30gmax").value = vs30.toFixed(2);
 
   agregarValorCalculado(vs30);
 }
 
-/* =========================================================
-   CALCULADORA Gmax
-========================================================= */
-
+/* CALCULADORA Gmax */
 function calcularGmax() {
   const densidad = parseFloat(document.getElementById("densidad").value);
   const vs30 = parseFloat(document.getElementById("vs30gmax").value);
@@ -126,14 +106,10 @@ function calcularGmax() {
   }
 
   const gmax = densidad * Math.pow(vs30, 2);
-
   resultado.innerHTML = "Gmax = " + formatearNumero(gmax);
 }
 
-/* =========================================================
-   CLASIFICACIÓN Vs30
-========================================================= */
-
+/* CLASIFICACIÓN */
 function clasificarVs30(vs30) {
   const normativaSelect = document.getElementById("normativa");
   const normativa = normativaSelect ? normativaSelect.value : "ncsr02";
@@ -156,35 +132,23 @@ function clasificarVs30(vs30) {
 }
 
 function obtenerColorVs30(vs30) {
-  if (vs30 >= 800) {
-    return "rgba(22, 163, 74, 0.85)";
-  }
-
-  if (vs30 >= 360) {
-    return "rgba(37, 99, 235, 0.85)";
-  }
-
-  if (vs30 >= 180) {
-    return "rgba(245, 158, 11, 0.85)";
-  }
-
+  if (vs30 >= 800) return "rgba(22, 163, 74, 0.85)";
+  if (vs30 >= 360) return "rgba(37, 99, 235, 0.85)";
+  if (vs30 >= 180) return "rgba(245, 158, 11, 0.85)";
   return "rgba(220, 38, 38, 0.85)";
 }
 
-/* =========================================================
-   GRÁFICA
-========================================================= */
-
+/* GRÁFICA */
 function inicializarGrafica() {
   const canvas = document.getElementById("graficaVs30");
 
   if (!canvas) {
-    console.error("No se ha encontrado el canvas con id graficaVs30.");
+    console.error("No se ha encontrado el canvas graficaVs30.");
     return;
   }
 
   if (typeof Chart === "undefined") {
-    console.error("Chart.js no se ha cargado. Revisa el script de Chart.js en index.html.");
+    console.error("Chart.js no se ha cargado.");
     return;
   }
 
@@ -286,27 +250,20 @@ function inicializarGrafica() {
 
 function actualizarGrafica() {
   const selectorSuelo = document.getElementById("suelo");
-
-  if (!selectorSuelo) {
-    console.error("No se ha encontrado el selector con id suelo.");
-    return;
-  }
+  if (!selectorSuelo) return;
 
   const tipo = selectorSuelo.value;
 
   const datosFiltrados = sondeos
     .filter(s => s.tipo === tipo)
-    .sort((a, b) => a.vs30 - b.vs30);
+    .sort((a, b) => Number(a.vs30) - Number(b.vs30));
 
   actualizarTabla(datosFiltrados);
 
-  if (!graficaVs30) {
-    console.warn("La gráfica todavía no está inicializada.");
-    return;
-  }
+  if (!graficaVs30) return;
 
   const labels = datosFiltrados.map(s => "Sondeo " + s.id);
-  const valores = datosFiltrados.map(s => s.vs30);
+  const valores = datosFiltrados.map(s => Number(s.vs30));
 
   const etiquetas = {
     granular: "Vs30 - Suelo granular",
@@ -340,17 +297,11 @@ function agregarValorCalculado(vs30) {
   graficaVs30.update();
 }
 
-/* =========================================================
-   TABLA
-========================================================= */
-
+/* TABLA */
 function actualizarTabla(datos) {
   const tabla = document.getElementById("tablaSondeos");
 
-  if (!tabla) {
-    console.error("No se ha encontrado la tabla con id tablaSondeos.");
-    return;
-  }
+  if (!tabla) return;
 
   tabla.innerHTML = "";
 
@@ -377,17 +328,10 @@ function actualizarTabla(datos) {
   });
 }
 
-/* =========================================================
-   ESTADÍSTICAS
-========================================================= */
-
+/* ESTADÍSTICAS */
 function actualizarEstadisticas() {
   const stats = document.getElementById("stats");
-
-  if (!stats) {
-    console.error("No se ha encontrado el contenedor con id stats.");
-    return;
-  }
+  if (!stats) return;
 
   const total = sondeos.length;
 
@@ -405,10 +349,7 @@ function actualizarEstadisticas() {
     "Gmax promedio <strong>" + formatearNumero(mediaGmax) + "</strong>";
 }
 
-/* =========================================================
-   UTILIDADES
-========================================================= */
-
+/* UTILIDADES */
 function formatearNumero(valor) {
   return Number(valor).toLocaleString("es-ES", {
     minimumFractionDigits: 0,
@@ -421,13 +362,8 @@ function capitalizar(texto) {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
-/* =========================================================
-   INICIO DE LA APLICACIÓN
-========================================================= */
-
+/* INICIO */
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("script.js cargado correctamente.");
-
   const selectorSuelo = document.getElementById("suelo");
   const selectorNormativa = document.getElementById("normativa");
 
