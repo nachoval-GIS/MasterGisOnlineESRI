@@ -16,7 +16,7 @@ function calcularVs30() {
 
   document.getElementById("resultadoVs30").innerHTML =
     "Vs30 = " + vs30.toFixed(2) + " m/s<br>" +
-    "Clasificación sísmica: " + clase;
+    "Clasificación sísmica (NCSR-02): " + clase;
 
   document.getElementById("vs30gmax").value = vs30.toFixed(2);
 }
