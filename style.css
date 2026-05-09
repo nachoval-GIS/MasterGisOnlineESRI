@@ -255,6 +255,40 @@ button {
 
     border-top: 1px solid #d1d5db;
 }
+.table-container{
+  margin-top: 30px;
+  background: white;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.table-container h3{
+  margin-top: 0;
+  margin-bottom: 18px;
+  color: #0f172a;
+}
+
+table{
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+thead{
+  background: #0f172a;
+  color: white;
+}
+
+th, td{
+  padding: 12px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+tbody tr:hover{
+  background: #f1f5f9;
+}
 /* SCROLLBAR */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
