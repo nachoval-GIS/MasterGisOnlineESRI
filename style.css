@@ -725,4 +725,45 @@ tbody tr:hover {
   .table-container h3 {
     font-size: 1.12rem;
   }
+  .chart-legend-vs30 {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-top: 18px;
+  font-size: 0.95rem;
+  color: #475569;
+}
+
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-box {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  min-height: 16px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.legend-red {
+  background-color: rgba(220, 38, 38, 0.85);
+}
+
+.legend-orange {
+  background-color: rgba(245, 158, 11, 0.85);
+}
+
+.legend-blue {
+  background-color: rgba(37, 99, 235, 0.85);
+}
+
+.legend-green {
+  background-color: rgba(22, 163, 74, 0.85);
+}
 }
