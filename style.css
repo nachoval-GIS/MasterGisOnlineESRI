@@ -80,6 +80,13 @@ body {
   font-weight: 300;
   color: var(--accent);
 }
+.subtitle{
+  margin-top: 8px;
+  font-size: 15px;
+  color: #6b7280;
+  font-weight: 400;
+}
+
 
 /* PANELES GLASSMORPHISM */
 .panel {
