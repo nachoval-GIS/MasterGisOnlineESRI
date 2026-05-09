@@ -1,1 +1,72 @@
-
+[
+  {
+    "id": "56",
+    "tipo": "granular",
+    "vs30": 290.87,
+    "gmax": 152291.80,
+    "estado": "Revisado"
+  },
+  {
+    "id": "62",
+    "tipo": "granular",
+    "vs30": 289.34,
+    "gmax": 150695.67,
+    "estado": "Revisado"
+  },
+  {
+    "id": "63",
+    "tipo": "granular",
+    "vs30": 301.87,
+    "gmax": 164020.62,
+    "estado": "Revisado"
+  },
+  {
+    "id": "64",
+    "tipo": "granular",
+    "vs30": 289.34,
+    "gmax": 150695.67,
+    "estado": "Revisado"
+  },
+  {
+    "id": "91",
+    "tipo": "granular",
+    "vs30": 300.36,
+    "gmax": 180430.26,
+    "estado": "Revisado"
+  },
+  {
+    "id": "205",
+    "tipo": "cohesivo",
+    "vs30": 304.51,
+    "gmax": 166905.45,
+    "estado": "Revisado"
+  },
+  {
+    "id": "207",
+    "tipo": "cohesivo",
+    "vs30": 299.10,
+    "gmax": 161200.00,
+    "estado": "Revisado"
+  },
+  {
+    "id": "208",
+    "tipo": "cohesivo",
+    "vs30": 301.20,
+    "gmax": 163450.00,
+    "estado": "Revisado"
+  },
+  {
+    "id": "209",
+    "tipo": "cohesivo",
+    "vs30": 297.80,
+    "gmax": 159900.00,
+    "estado": "Revisado"
+  },
+  {
+    "id": "300",
+    "tipo": "cohesivo",
+    "vs30": 296.40,
+    "gmax": 158700.00,
+    "estado": "Revisado"
+  }
+]
