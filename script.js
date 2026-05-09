@@ -1,33 +1,64 @@
 function calcularVs30() {
-  let n60 = document.getElementById("n60").value;
+  let n60 = parseFloat(document.getElementById("n60").value);
+
+  if (isNaN(n60) || n60 <= 0) {
+    document.getElementById("resultadoVs30").innerHTML =
+      "Introduce un valor N válido.";
+    return;
+  }
+
   let vs30 = 259.24 * Math.pow(n60, 0.05);
 
-  let clase = "";
-
-  if (vs30 > 750) {
-    clase = "Tipo A";
-  } else if (vs30 >= 360) {
-    clase = "Tipo B";
-  } else if (vs30 >= 180) {
-    clase = "Tipo C";
-  } else {
-    clase = "Tipo D";
-  }
+  let clase = clasificarVs30(vs30);
 
   document.getElementById("resultadoVs30").innerHTML =
     "Vs30 = " + vs30.toFixed(2) + " m/s<br>" +
-    "Clasificación sísmica (NCSR-02): " + clase;
+    "Clasificación sísmica: " + clase;
 
   document.getElementById("vs30gmax").value = vs30.toFixed(2);
+
+  agregarValorCalculado(vs30);
+}
+
+ function clasificarVs30(vs30) {
+  let normativa = document.getElementById("normativa").value;
+
+  if (normativa === "ncsr02") {
+    if (vs30 > 750) return "Tipo A";
+    if (vs30 >= 360) return "Tipo B";
+    if (vs30 >= 180) return "Tipo C";
+    return "Tipo D";
+  }
+
+  if (normativa === "ec8") {
+    if (vs30 > 800) return "Clase A";
+    if (vs30 >= 360) return "Clase B";
+    if (vs30 >= 180) return "Clase C";
+    return "Clase D";
+  }
+}
+function agregarValorCalculado(vs30) {
+  graficaVs30.data.labels.push("Calculado");
+  graficaVs30.data.datasets[0].data.push(vs30.toFixed(2));
+  graficaVs30.update();
 }
 
 function calcularGmax() {
-  let densidad = document.getElementById("densidad").value;
-  let vs30 = document.getElementById("vs30gmax").value;
+  let densidad = parseFloat(document.getElementById("densidad").value);
+  let vs30 = parseFloat(document.getElementById("vs30gmax").value);
+
+  if (isNaN(densidad) || isNaN(vs30)) {
+    document.getElementById("resultadoGmax").innerHTML =
+      "Introduce densidad y Vs30 válidos.";
+    return;
+  }
+
   let gmax = densidad * Math.pow(vs30, 2);
 
   document.getElementById("resultadoGmax").innerHTML =
-    "Gmax = " + gmax.toFixed(2);
+    "Gmax = " + gmax.toLocaleString("es-ES", {
+      maximumFractionDigits: 2
+    }) + " T/m³";
 }
 
 const datosSuelos = {
