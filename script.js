@@ -114,8 +114,14 @@ function actualizarTabla(datos) {
 }
 
 function agregarValorCalculado(vs30) {
+  let valor = Number(vs30.toFixed(2));
+  let color = obtenerColorVs30(valor);
+
   graficaVs30.data.labels.push("Calculado");
-  graficaVs30.data.datasets[0].data.push(Number(vs30.toFixed(2)));
+  graficaVs30.data.datasets[0].data.push(valor);
+  graficaVs30.data.datasets[0].backgroundColor.push(color);
+  graficaVs30.data.datasets[0].borderColor.push(color.replace("0.85", "1"));
+
   graficaVs30.update();
 }
 
