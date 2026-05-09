@@ -2,8 +2,21 @@ function calcularVs30() {
   let n60 = document.getElementById("n60").value;
   let vs30 = 259.24 * Math.pow(n60, 0.05);
 
+  let clase = "";
+
+  if (vs30 > 750) {
+    clase = "Tipo A";
+  } else if (vs30 >= 360) {
+    clase = "Tipo B";
+  } else if (vs30 >= 180) {
+    clase = "Tipo C";
+  } else {
+    clase = "Tipo D";
+  }
+
   document.getElementById("resultadoVs30").innerHTML =
-    "Vs30 = " + vs30.toFixed(2) + " m/s";
+    "Vs30 = " + vs30.toFixed(2) + " m/s<br>" +
+    "Clasificación sísmica: " + clase;
 
   document.getElementById("vs30gmax").value = vs30.toFixed(2);
 }
