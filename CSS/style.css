@@ -1,0 +1,237 @@
+:root {
+  --primary: #0078d4;
+  --primary-hover: #005fa3;
+  --bg-dark: #0f172a;
+  --sidebar-bg: #1e293b;
+  --text-light: #f8fafc;
+  --text-muted: #94a3b8;
+  --accent: #38bdf8;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --success: #10b981;
+}
+
+* {
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  background: #f1f5f9;
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 350px;
+  background: var(--bg-dark);
+  color: var(--text-light);
+  height: 100vh;
+  padding: 25px;
+  overflow-y: auto;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* LOGO UGR */
+.university-logo {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.university-logo img {
+  max-width: 160px;
+  height: auto;
+  /* El filtro invert(1) convierte logos oscuros a blanco para que resalten */
+  filter: brightness(0) invert(1); 
+  opacity: 0.95;
+}
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 35px;
+  justify-content: center;
+}
+
+.sidebar-header i {
+  font-size: 1.8rem;
+  color: var(--accent);
+}
+
+.sidebar-header h1 {
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.sidebar-header h1 span {
+  display: block;
+  font-weight: 300;
+  color: var(--accent);
+}
+
+/* PANELES GLASSMORPHISM */
+.panel {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+}
+
+.panel h3 {
+  font-size: 0.9rem;
+  margin-top: 0;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.formula-badge {
+  background: rgba(56, 189, 248, 0.1);
+  color: var(--accent);
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+  margin-bottom: 15px;
+  border: 1px dashed rgba(56, 189, 248, 0.3);
+}
+
+/* FORMULARIOS */
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px 12px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  color: white;
+  font-size: 0.9rem;
+}
+
+input:focus, select:focus {
+  border-color: var(--accent);
+  outline: none;
+  background: rgba(0,0,0,0.3);
+}
+
+select option {
+  background: var(--sidebar-bg);
+}
+
+/* BOTONES */
+button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+.btn-secondary { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+.btn-secondary:hover { background: var(--accent); color: var(--bg-dark); }
+
+.result-display {
+  margin-top: 15px;
+  font-weight: 700;
+  color: var(--success);
+  text-align: center;
+  font-size: 0.95rem;
+  min-height: 1.2em;
+}
+
+/* ESTADÍSTICAS */
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.stat-item span { font-size: 0.8rem; color: var(--text-muted); }
+.stat-item strong { color: white; }
+
+/* CONTENIDO PRINCIPAL */
+.main-content {
+  flex: 1;
+  padding: 40px;
+  background: #f8fafc;
+  overflow-y: auto;
+}
+
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 35px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 20px;
+}
+
+.main-header h2 {
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.avatar {
+  width: 35px;
+  height: 35px;
+  background: var(--primary);
+  border-radius: 50%;
+}
+
+.chart-container {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
