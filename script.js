@@ -73,11 +73,10 @@ async function cargarSondeos() {
   try {
     if (
       !AGOL_FEATURE_LAYER_URL ||
-    AGOL_FEATURE_LAYER_URL.includes("PEGA_AQUI")
+      AGOL_FEATURE_LAYER_URL.includes("PEGA_AQUI")
     ) {
       throw new Error("Falta configurar la URL de la capa de ArcGIS Online.");
     }
-
 
     const parametros = new URLSearchParams({
       f: "json",
@@ -115,7 +114,6 @@ async function cargarSondeos() {
     console.log("Sondeos cargados desde ArcGIS Online:", sondeos);
 
     actualizarGrafica();
-    actualizarEstadisticas();
 
   } catch (error) {
     console.error("Error cargando datos desde ArcGIS Online:", error);
@@ -431,6 +429,7 @@ function actualizarGrafica() {
     .sort((a, b) => a.vs30 - b.vs30);
 
   actualizarTabla(datosFiltrados);
+  actualizarEstadisticas(datosFiltrados, tipo);
 
   if (!graficaVs30) {
     console.warn("La gráfica todavía no está inicializada.");
@@ -513,7 +512,7 @@ function actualizarTabla(datos) {
    ESTADÍSTICAS
 ========================================================= */
 
-function actualizarEstadisticas() {
+function actualizarEstadisticas(datosFiltrados, tipoSeleccionado) {
   const stats = document.getElementById("stats");
 
   if (!stats) {
@@ -521,20 +520,38 @@ function actualizarEstadisticas() {
     return;
   }
 
-  const total = sondeos.length;
-
-  if (total === 0) {
-    stats.innerHTML = "No hay sondeos cargados.";
+  if (!datosFiltrados || datosFiltrados.length === 0) {
+    stats.innerHTML =
+      "Tipo seleccionado <strong>" + obtenerNombreTipo(tipoSeleccionado) + "</strong><br>" +
+      "Sondeos filtrados <strong>0</strong><br>" +
+      "Vs30 promedio <strong>-</strong><br>" +
+      "Gmax promedio <strong>-</strong>";
     return;
   }
 
-  const mediaVs30 = sondeos.reduce((acc, s) => acc + Number(s.vs30), 0) / total;
-  const mediaGmax = sondeos.reduce((acc, s) => acc + Number(s.gmax), 0) / total;
+  const total = datosFiltrados.length;
+
+  const mediaVs30 =
+    datosFiltrados.reduce((acc, s) => acc + Number(s.vs30), 0) / total;
+
+  const mediaGmax =
+    datosFiltrados.reduce((acc, s) => acc + Number(s.gmax), 0) / total;
 
   stats.innerHTML =
-    "Sondeos realizados <strong>" + total + "</strong><br>" +
+    "Tipo seleccionado <strong>" + obtenerNombreTipo(tipoSeleccionado) + "</strong><br>" +
+    "Sondeos filtrados <strong>" + total + "</strong><br>" +
     "Vs30 promedio <strong>" + mediaVs30.toFixed(2) + " m/s</strong><br>" +
     "Gmax promedio <strong>" + formatearNumero(mediaGmax) + "</strong>";
+}
+
+function obtenerNombreTipo(tipo) {
+  const nombres = {
+    granular: "Suelo granular",
+    cohesivo: "Suelo cohesivo",
+    noclasificado: "Zona no clasificada"
+  };
+
+  return nombres[tipo] || "Sin clasificar";
 }
 
 /* =========================================================
