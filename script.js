@@ -73,10 +73,10 @@ async function cargarSondeos() {
   try {
     if (
       !AGOL_FEATURE_LAYER_URL ||
-      AGOL_FEATURE_LAYER_URL === "https://services6.arcgis.com/vQa0SVm7Y0deDYFA/arcgis/rest/services/Sondeos_Campo_SantaFe_Publica_OK/FeatureServer/0"
-   ) {
-        throw new Error("Falta configurar la URL de la capa de ArcGIS Online.");
-   }
+    AGOL_FEATURE_LAYER_URL.includes("PEGA_AQUI")
+    ) {
+      throw new Error("Falta configurar la URL de la capa de ArcGIS Online.");
+    }
 
 
     const parametros = new URLSearchParams({
