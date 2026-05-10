@@ -105,7 +105,6 @@ async function cargarSondeos() {
     if (!datos.features || datos.features.length === 0) {
       sondeos = [];
       actualizarGrafica();
-      actualizarEstadisticas();
       return;
     }
 
