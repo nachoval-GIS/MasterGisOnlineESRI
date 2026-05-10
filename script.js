@@ -524,7 +524,7 @@ function actualizarEstadisticas(datosFiltrados, tipoSeleccionado) {
       "Tipo seleccionado <strong>" + obtenerNombreTipo(tipoSeleccionado) + "</strong><br>" +
       "Sondeos filtrados <strong>0</strong><br>" +
       "Vs30 promedio <strong>-</strong><br>" +
-      "Gmax promedio <strong>- KPa</strong>";
+      "Gmax promedio <strong>- kPa</strong>";
     return;
   }
 
@@ -540,7 +540,7 @@ function actualizarEstadisticas(datosFiltrados, tipoSeleccionado) {
     "Tipo seleccionado <strong>" + obtenerNombreTipo(tipoSeleccionado) + "</strong><br>" +
     "Sondeos filtrados <strong>" + total + "</strong><br>" +
     "Vs30 promedio <strong>" + mediaVs30.toFixed(2) + " m/s</strong><br>" +
-    "Gmax promedio <strong>" + formatearNumero(mediaGmax) + " KPa</strong>";
+    "Gmax promedio <strong>" + formatearNumero(mediaGmax) + " kPa</strong>";
 }
 
 function obtenerNombreTipo(tipo) {
