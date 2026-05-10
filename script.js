@@ -21,11 +21,11 @@ const AGOL_FEATURE_LAYER_URL = "https://services6.arcgis.com/vQa0SVm7Y0deDYFA/ar
 */
 
 const CAMPOS_AGOL = {
-  id: "id",
-  tipo: "tipo",
-  vs30: "vs30",
-  gmax: "gmax",
-  estado: "estado"
+  id: "ID",
+  tipo: "Tipo_Suelo",
+  vs30: "Vs30",
+  gmax: "Gmax",
+  estado: "Estado"
 };
 
 /* =========================================================
@@ -74,9 +74,10 @@ async function cargarSondeos() {
     if (
       !AGOL_FEATURE_LAYER_URL ||
       AGOL_FEATURE_LAYER_URL === "https://services6.arcgis.com/vQa0SVm7Y0deDYFA/arcgis/rest/services/Sondeos_Campo_SantaFe_Publica_OK/FeatureServer/0"
-    ) {
-      throw new Error("Falta configurar la URL de la capa de ArcGIS Online.");
-    }
+   ) {
+        throw new Error("Falta configurar la URL de la capa de ArcGIS Online.");
+   }
+
 
     const parametros = new URLSearchParams({
       f: "json",
