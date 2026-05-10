@@ -442,8 +442,7 @@ function actualizarGrafica() {
   const etiquetas = {
     granular: "Vs30 - Suelo granular",
     cohesivo: "Vs30 - Suelo cohesivo",
-    noclasificado: "Vs30 - Zona no clasificada"
-  };
+    };
 
   const coloresVs30 = valores.map(v => obtenerColorVs30(v));
   const bordesVs30 = coloresVs30.map(color => color.replace("0.85", "1"));
@@ -548,8 +547,7 @@ function obtenerNombreTipo(tipo) {
   const nombres = {
     granular: "Suelo granular",
     cohesivo: "Suelo cohesivo",
-    noclasificado: "Zona no clasificada"
-  };
+   };
 
   return nombres[tipo] || "Sin clasificar";
 }
