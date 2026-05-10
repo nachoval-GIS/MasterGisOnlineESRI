@@ -8,6 +8,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap"
     rel="stylesheet"
@@ -18,23 +19,23 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
   />
 
-  <link rel="stylesheet" href="./style.css?v=20" />
+  <link rel="stylesheet" href="./style.css?v=70" />
 </head>
 
 <body>
   <aside class="sidebar">
     <div class="university-logo">
-      <img src="./UGR-Logo.png" alt="Logo Universidad de Granada" />
+      <img src="UGR-Logo.png" alt="Logo Universidad de Granada" />
     </div>
 
     <div class="sidebar-header">
-      <i class="fas fa-mountain-sun" aria-hidden="true"></i>
+      <i class="fas fa-mountain-sun"></i>
       <h1>VISOR <span>GEOTÉCNICO</span></h1>
     </div>
 
     <div class="panel-container">
       <section class="panel">
-        <h3><i class="fas fa-calculator" aria-hidden="true"></i> Calculadora Vs30</h3>
+        <h3><i class="fas fa-calculator"></i> Calculadora Vs30</h3>
 
         <div class="formula-badge">
           Vs30 = 259.24 · (N<sub>60</sub>)<sup>0.05</sup>
@@ -50,7 +51,13 @@
 
         <div class="input-group">
           <label for="n60">N (SPT)</label>
-          <input type="number" id="n60" placeholder="Ej. 30" min="0" step="0.01" />
+          <input
+            type="number"
+            id="n60"
+            placeholder="Ej. 30"
+            min="0"
+            step="0.01"
+          />
         </div>
 
         <button type="button" onclick="calcularVs30()" class="btn-primary">
@@ -61,7 +68,7 @@
       </section>
 
       <section class="panel">
-        <h3><i class="fas fa-wave-square" aria-hidden="true"></i> Calculadora Gmax</h3>
+        <h3><i class="fas fa-wave-square"></i> Calculadora Gmax</h3>
 
         <div class="formula-badge">
           Gmax = ρ · Vs30²
@@ -69,12 +76,24 @@
 
         <div class="input-group">
           <label for="densidad">Densidad (ρ)</label>
-          <input type="number" id="densidad" placeholder="kg/m³" min="0" step="0.01" />
+          <input
+            type="number"
+            id="densidad"
+            placeholder="kg/m³"
+            min="0"
+            step="0.01"
+          />
         </div>
 
         <div class="input-group">
           <label for="vs30gmax">Vs30 (m/s)</label>
-          <input type="number" id="vs30gmax" placeholder="m/s" min="0" step="0.01" />
+          <input
+            type="number"
+            id="vs30gmax"
+            placeholder="m/s"
+            min="0"
+            step="0.01"
+          />
         </div>
 
         <button type="button" onclick="calcularGmax()" class="btn-secondary">
@@ -85,7 +104,7 @@
       </section>
 
       <section class="panel">
-        <h3><i class="fas fa-layer-group" aria-hidden="true"></i> Tipo de suelo</h3>
+        <h3><i class="fas fa-layer-group"></i> Tipo de suelo</h3>
 
         <select id="suelo" class="custom-select">
           <option value="granular">Suelo granular</option>
@@ -94,8 +113,11 @@
       </section>
 
       <section class="panel stats-panel">
-        <h3><i class="fas fa-chart-pie" aria-hidden="true"></i> Estadísticas del filtro</h3>
-        <div id="stats">Cargando estadísticas...</div>
+        <h3><i class="fas fa-chart-pie"></i> Estadísticas del filtro</h3>
+
+        <div id="stats">
+          Cargando estadísticas...
+        </div>
       </section>
     </div>
   </aside>
@@ -104,6 +126,7 @@
     <header class="main-header">
       <div>
         <h2>Análisis de Velocidad de Onda de Corte</h2>
+
         <p class="subtitle">
           Estimación de parámetros geotécnicos mediante correlaciones SPT-Vs30 y cálculo dinámico de Gmax
         </p>
@@ -114,6 +137,7 @@
       <div class="chart-header">
         <div>
           <h3>Distribución de Vs30 por sondeo</h3>
+
           <p>
             Representación comparativa de la velocidad media de onda de corte en los puntos analizados.
           </p>
@@ -125,25 +149,25 @@
       </div>
 
       <div class="chart-legend-vs30" aria-label="Leyenda de rangos Vs30">
-        <div class="legend-item">
-          <span class="legend-box legend-red" aria-hidden="true"></span>
-          <span>Vs30 &lt; 180 m/s</span>
-        </div>
+        <span>
+          <i class="legend-red"></i>
+          Vs30 &lt; 180 m/s
+        </span>
 
-        <div class="legend-item">
-          <span class="legend-box legend-orange" aria-hidden="true"></span>
-          <span>180–360 m/s</span>
-        </div>
+        <span>
+          <i class="legend-orange"></i>
+          180–360 m/s
+        </span>
 
-        <div class="legend-item">
-          <span class="legend-box legend-blue" aria-hidden="true"></span>
-          <span>360–800 m/s</span>
-        </div>
+        <span>
+          <i class="legend-blue"></i>
+          360–800 m/s
+        </span>
 
-        <div class="legend-item">
-          <span class="legend-box legend-green" aria-hidden="true"></span>
-          <span>&gt; 800 m/s</span>
-        </div>
+        <span>
+          <i class="legend-green"></i>
+          &gt; 800 m/s
+        </span>
       </div>
     </section>
 
@@ -188,7 +212,7 @@
     </footer>
   </main>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
-  <script src="./script.js?v=32"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="./script.js?v=70"></script>
 </body>
 </html>
