@@ -257,7 +257,7 @@ function calcularGmax() {
 
   const gmax = densidad * Math.pow(vs30, 2);
 
-  resultado.innerHTML = "Gmax = " + formatearNumero(gmax);
+  resultado.innerHTML = "Gmax = " + formatearNumero(gmax) + " kPa";
 }
 
 /* =========================================================
