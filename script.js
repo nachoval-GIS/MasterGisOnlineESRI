@@ -1,9 +1,37 @@
 let sondeos = [];
 let graficaVs30 = null;
 
-const VERSION_DATOS = "v=25";
+/* =========================================================
+   CONFIGURACIÓN ARCGIS ONLINE
+   Pega aquí la URL REST de tu capa.
+   Debe terminar en /FeatureServer/0
+========================================================= */
 
-/* LÍNEA DE REFERENCIA Vs30 = 360 m/s */
+const AGOL_FEATURE_LAYER_URL = "https://services6.arcgis.com/vQa0SVm7Y0deDYFA/arcgis/rest/services/Sondeos_Campo_SantaFe_Publica/FeatureServer/0";
+
+/*
+  Ajusta estos nombres si tus campos en ArcGIS Online se llaman distinto.
+
+  Ejemplos posibles:
+  id: "ID", "Id", "Borehole", "Sondeo"
+  tipo: "tipo", "Tipo", "TIPO_SUELO", "Litologia"
+  vs30: "vs30", "Vs30", "VS30"
+  gmax: "gmax", "Gmax", "GMAX"
+  estado: "estado", "Estado", "ESTADO"
+*/
+
+const CAMPOS_AGOL = {
+  id: "id",
+  tipo: "tipo",
+  vs30: "vs30",
+  gmax: "gmax",
+  estado: "estado"
+};
+
+/* =========================================================
+   PLUGIN: LÍNEA HORIZONTAL DE UMBRAL Vs30 = 360 m/s
+========================================================= */
+
 const umbralVs30Plugin = {
   id: "umbralVs30Plugin",
 
@@ -19,6 +47,7 @@ const umbralVs30Plugin = {
     if (y < chartArea.top || y > chartArea.bottom) return;
 
     ctx.save();
+
     ctx.beginPath();
     ctx.setLineDash([6, 6]);
     ctx.strokeStyle = "rgba(15, 23, 42, 0.45)";
@@ -29,53 +58,173 @@ const umbralVs30Plugin = {
 
     ctx.setLineDash([]);
     ctx.fillStyle = "rgba(15, 23, 42, 0.75)";
-    ctx.font = "600 12px Inter, Arial, sans-serif";
+    ctx.font = "600 12px Inter, sans-serif";
     ctx.fillText("Umbral 360 m/s", chartArea.left + 8, y - 8);
+
     ctx.restore();
   }
 };
 
-/* CARGA DE DATOS */
+/* =========================================================
+   CARGA DE DATOS DESDE ARCGIS ONLINE
+========================================================= */
+
 async function cargarSondeos() {
   try {
-    const respuesta = await fetch(`./sondeos.json?${VERSION_DATOS}`, {
-      cache: "no-store"
-    });
-
-    if (!respuesta.ok) {
-      throw new Error("No se pudo cargar sondeos.json");
+    if (
+      !AGOL_FEATURE_LAYER_URL ||
+      AGOL_FEATURE_LAYER_URL === "PEGA_AQUI_TU_URL_FEATURESERVER_0"
+    ) {
+      throw new Error("Falta configurar la URL de la capa de ArcGIS Online.");
     }
 
-    sondeos = await respuesta.json();
+    const parametros = new URLSearchParams({
+      f: "json",
+      where: "1=1",
+      outFields: "*",
+      returnGeometry: "false"
+    });
+
+    const urlConsulta = `${AGOL_FEATURE_LAYER_URL}/query?${parametros.toString()}`;
+
+    console.log("Consultando ArcGIS Online:", urlConsulta);
+
+    const respuesta = await fetch(urlConsulta);
+
+    if (!respuesta.ok) {
+      throw new Error("No se pudo conectar con ArcGIS Online.");
+    }
+
+    const datos = await respuesta.json();
+
+    if (datos.error) {
+      throw new Error(datos.error.message || "Error devuelto por ArcGIS Online.");
+    }
+
+    if (!datos.features || datos.features.length === 0) {
+      sondeos = [];
+      actualizarGrafica();
+      actualizarEstadisticas();
+      return;
+    }
+
+    sondeos = datos.features
+      .map(feature => normalizarSondeo(feature.attributes))
+      .filter(s => s !== null);
+
+    console.log("Sondeos cargados desde ArcGIS Online:", sondeos);
 
     actualizarGrafica();
     actualizarEstadisticas();
 
   } catch (error) {
-    console.error("Error cargando sondeos.json:", error);
+    console.error("Error cargando datos desde ArcGIS Online:", error);
 
     const tabla = document.getElementById("tablaSondeos");
+
     if (tabla) {
       tabla.innerHTML = `
         <tr>
           <td colspan="6">
-            No se han podido cargar los datos. Revisa que sondeos.json esté junto a index.html.
+            No se han podido cargar los datos desde ArcGIS Online.
+            Revisa la URL de la capa, los permisos públicos y los nombres de campos.
           </td>
         </tr>
       `;
     }
 
     const stats = document.getElementById("stats");
+
     if (stats) {
       stats.innerHTML = "No se han podido cargar las estadísticas.";
     }
   }
 }
 
-/* CALCULADORA Vs30 */
+/* =========================================================
+   NORMALIZACIÓN DE DATOS DE ARCGIS ONLINE
+========================================================= */
+
+function normalizarSondeo(atributos) {
+  const id = obtenerValorCampo(atributos, CAMPOS_AGOL.id);
+  const tipoOriginal = obtenerValorCampo(atributos, CAMPOS_AGOL.tipo);
+  const vs30 = Number(obtenerValorCampo(atributos, CAMPOS_AGOL.vs30));
+  const gmax = Number(obtenerValorCampo(atributos, CAMPOS_AGOL.gmax));
+  const estado = obtenerValorCampo(atributos, CAMPOS_AGOL.estado) || "Sin revisar";
+
+  if (!id || isNaN(vs30)) {
+    return null;
+  }
+
+  return {
+    id: id,
+    tipo: normalizarTipoSuelo(tipoOriginal),
+    vs30: vs30,
+    gmax: isNaN(gmax) ? 0 : gmax,
+    estado: estado
+  };
+}
+
+function obtenerValorCampo(atributos, nombreCampo) {
+  if (!atributos || !nombreCampo) return null;
+
+  if (atributos[nombreCampo] !== undefined && atributos[nombreCampo] !== null) {
+    return atributos[nombreCampo];
+  }
+
+  const campoEncontrado = Object.keys(atributos).find(
+    key => key.toLowerCase() === nombreCampo.toLowerCase()
+  );
+
+  if (campoEncontrado) {
+    return atributos[campoEncontrado];
+  }
+
+  return null;
+}
+
+function normalizarTipoSuelo(valor) {
+  if (!valor) return "noclasificado";
+
+  const texto = String(valor).toLowerCase().trim();
+
+  if (
+    texto.includes("granular") ||
+    texto.includes("arena") ||
+    texto.includes("grava")
+  ) {
+    return "granular";
+  }
+
+  if (
+    texto.includes("cohesivo") ||
+    texto.includes("arcilla") ||
+    texto.includes("limo")
+  ) {
+    return "cohesivo";
+  }
+
+  if (
+    texto.includes("no clasificado") ||
+    texto.includes("noclasificado") ||
+    texto.includes("sin clasificar")
+  ) {
+    return "noclasificado";
+  }
+
+  return texto;
+}
+
+/* =========================================================
+   CALCULADORA Vs30
+========================================================= */
+
 function calcularVs30() {
-  const n60 = parseFloat(document.getElementById("n60").value);
+  const inputN60 = document.getElementById("n60");
   const resultado = document.getElementById("resultadoVs30");
+  const inputVs30Gmax = document.getElementById("vs30gmax");
+
+  const n60 = parseFloat(inputN60.value);
 
   if (isNaN(n60) || n60 <= 0) {
     resultado.innerHTML = "Introduce un valor N válido.";
@@ -89,12 +238,15 @@ function calcularVs30() {
     "Vs30 = " + vs30.toFixed(2) + " m/s<br>" +
     "Clasificación sísmica: " + clase;
 
-  document.getElementById("vs30gmax").value = vs30.toFixed(2);
+  inputVs30Gmax.value = vs30.toFixed(2);
 
   agregarValorCalculado(vs30);
 }
 
-/* CALCULADORA Gmax */
+/* =========================================================
+   CALCULADORA Gmax
+========================================================= */
+
 function calcularGmax() {
   const densidad = parseFloat(document.getElementById("densidad").value);
   const vs30 = parseFloat(document.getElementById("vs30gmax").value);
@@ -106,10 +258,14 @@ function calcularGmax() {
   }
 
   const gmax = densidad * Math.pow(vs30, 2);
+
   resultado.innerHTML = "Gmax = " + formatearNumero(gmax);
 }
 
-/* CLASIFICACIÓN */
+/* =========================================================
+   CLASIFICACIÓN Vs30
+========================================================= */
+
 function clasificarVs30(vs30) {
   const normativaSelect = document.getElementById("normativa");
   const normativa = normativaSelect ? normativaSelect.value : "ncsr02";
@@ -132,18 +288,30 @@ function clasificarVs30(vs30) {
 }
 
 function obtenerColorVs30(vs30) {
-  if (vs30 >= 800) return "rgba(22, 163, 74, 0.85)";
-  if (vs30 >= 360) return "rgba(37, 99, 235, 0.85)";
-  if (vs30 >= 180) return "rgba(245, 158, 11, 0.85)";
+  if (vs30 >= 800) {
+    return "rgba(22, 163, 74, 0.85)";
+  }
+
+  if (vs30 >= 360) {
+    return "rgba(37, 99, 235, 0.85)";
+  }
+
+  if (vs30 >= 180) {
+    return "rgba(245, 158, 11, 0.85)";
+  }
+
   return "rgba(220, 38, 38, 0.85)";
 }
 
-/* GRÁFICA */
+/* =========================================================
+   GRÁFICA
+========================================================= */
+
 function inicializarGrafica() {
   const canvas = document.getElementById("graficaVs30");
 
   if (!canvas) {
-    console.error("No se ha encontrado el canvas graficaVs30.");
+    console.error("No se ha encontrado el canvas con id graficaVs30.");
     return;
   }
 
@@ -250,20 +418,27 @@ function inicializarGrafica() {
 
 function actualizarGrafica() {
   const selectorSuelo = document.getElementById("suelo");
-  if (!selectorSuelo) return;
+
+  if (!selectorSuelo) {
+    console.error("No se ha encontrado el selector con id suelo.");
+    return;
+  }
 
   const tipo = selectorSuelo.value;
 
   const datosFiltrados = sondeos
     .filter(s => s.tipo === tipo)
-    .sort((a, b) => Number(a.vs30) - Number(b.vs30));
+    .sort((a, b) => a.vs30 - b.vs30);
 
   actualizarTabla(datosFiltrados);
 
-  if (!graficaVs30) return;
+  if (!graficaVs30) {
+    console.warn("La gráfica todavía no está inicializada.");
+    return;
+  }
 
   const labels = datosFiltrados.map(s => "Sondeo " + s.id);
-  const valores = datosFiltrados.map(s => Number(s.vs30));
+  const valores = datosFiltrados.map(s => s.vs30);
 
   const etiquetas = {
     granular: "Vs30 - Suelo granular",
@@ -297,11 +472,17 @@ function agregarValorCalculado(vs30) {
   graficaVs30.update();
 }
 
-/* TABLA */
+/* =========================================================
+   TABLA
+========================================================= */
+
 function actualizarTabla(datos) {
   const tabla = document.getElementById("tablaSondeos");
 
-  if (!tabla) return;
+  if (!tabla) {
+    console.error("No se ha encontrado la tabla con id tablaSondeos.");
+    return;
+  }
 
   tabla.innerHTML = "";
 
@@ -328,10 +509,17 @@ function actualizarTabla(datos) {
   });
 }
 
-/* ESTADÍSTICAS */
+/* =========================================================
+   ESTADÍSTICAS
+========================================================= */
+
 function actualizarEstadisticas() {
   const stats = document.getElementById("stats");
-  if (!stats) return;
+
+  if (!stats) {
+    console.error("No se ha encontrado el contenedor con id stats.");
+    return;
+  }
 
   const total = sondeos.length;
 
@@ -349,7 +537,10 @@ function actualizarEstadisticas() {
     "Gmax promedio <strong>" + formatearNumero(mediaGmax) + "</strong>";
 }
 
-/* UTILIDADES */
+/* =========================================================
+   UTILIDADES
+========================================================= */
+
 function formatearNumero(valor) {
   return Number(valor).toLocaleString("es-ES", {
     minimumFractionDigits: 0,
@@ -362,8 +553,13 @@ function capitalizar(texto) {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
 }
 
-/* INICIO */
+/* =========================================================
+   INICIO DE LA APLICACIÓN
+========================================================= */
+
 document.addEventListener("DOMContentLoaded", () => {
+  console.log("script.js cargado correctamente.");
+
   const selectorSuelo = document.getElementById("suelo");
   const selectorNormativa = document.getElementById("normativa");
 
