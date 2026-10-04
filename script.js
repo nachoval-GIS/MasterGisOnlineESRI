@@ -7,7 +7,7 @@ let graficaVs30 = null;
    Debe terminar en /FeatureServer/0
 ========================================================= */
 
-const AGOL_FEATURE_LAYER_URL = "https://services6.arcgis.com/vQa0SVm7Y0deDYFA/arcgis/rest/services/Sondeos_Campo_SantaFe_Publica_OK/FeatureServer/0";
+const AGOL_FEATURE_LAYER_URL = "https://services-eu1.arcgis.com/Izokdqjlod950a82/arcgis/rest/services/Sondeos_Campo_SantaFe_Publica_OK/FeatureServer/0";
 
 /*
   Ajusta estos nombres si tus campos en ArcGIS Online se llaman distinto.
